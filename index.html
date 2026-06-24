@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>종말급 운석 충돌 효과 (수량 & 주기 조절 추가)</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="control-panel">
+        <div class="control-row">
+            <div class="control-label">운석 소환 수량: <span id="countDisplay" class="count-value">15</span>개</div>
+            <input type="range" id="meteorSlider" class="count-slider" min="5" max="50" value="15" oninput="updateCount(this.value)">
+        </div>
+        <div class="control-row">
+            <div class="control-label">최대 낙하 지연 주기: <span id="intervalDisplay" class="count-value">2.5</span>초</div>
+            <input type="range" id="intervalSlider" class="count-slider" min="0.05" max="5" step="0.01" value="2.5" oninput="updateInterval(this.value)">
+        </div>
+    </div>
+
+    <div class="ground"></div>
+    <button class="meteor-btn" onclick="dropMeteor()">운석 소환</button>
+
+    <script>
+        function updateCount(val) {
+            document.getElementById('countDisplay').innerText = val;
+        }
+        
+        // 주기 슬라이더 값을 실시간 반영하는 함수
+        function updateInterval(val) {
+            document.getElementById('intervalDisplay').innerText = val;
+        }
+
+        function dropMeteor() {
+            document.body.classList.remove('shake');
+            void document.body.offsetWidth; 
+
+            // 슬라이더들의 실시간 Value값 캡처
+            const count = parseInt(document.getElementById('meteorSlider').value); 
+            const maxInterval = parseFloat(document.getElementById('intervalSlider').value);
+            
+            for (let i = 0; i < count; i++) {
+                const targetX = Math.random() * window.innerWidth;
+                const targetY = window.innerHeight - (Math.random() * 80 + 30);
+
+                const targetZone = document.createElement('div');
+                targetZone.classList.add('target-zone');
+                targetZone.style.left = targetX + 'px';
+                targetZone.style.top = targetY + 'px';
+                document.body.appendChild(targetZone);
+
+                const meteor = document.createElement('div');
+                meteor.classList.add('meteor');
+                
+                const startX = targetX + (Math.random() * 400 + 600); 
+                const startY = targetY - (startX - targetX); 
+                
+                meteor.style.left = (startX - parseFloat(meteor.style.width || 200)) + 'px';
+                meteor.style.top = startY + 'px';
+                meteor.style.width = (Math.random() * 180 + 150) + 'px';
+
+                const duration = Math.random() * 0.5 + 0.6; 
+                
+                // 💡 핵심 연산: 수량에 무관하게 지연 범위(delay)가 주기 슬라이더의 한도(maxInterval) 내에서 랜덤 결정됩니다.
+                const delay = Math.random() * maxInterval; 
+
+                meteor.style.animationDuration = duration + 's';
+                meteor.style.animationDelay = delay + 's';
+
+                const deltaX = targetX - startX;
+                const deltaY = targetY - startY;
+                const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                
+                meteor.style.transform = `translate(0, 0) rotate(${angle}deg)`;
+
+                setTimeout(() => {
+                    meteor.style.opacity = '1';
+                    meteor.style.transition = `transform ${duration}s linear, opacity 0.1s`;
+                    meteor.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${angle}deg)`;
+                }, delay * 1000);
+
+                document.body.appendChild(meteor);
+
+                const hitTime = (duration + delay) * 1000;
+
+                setTimeout(() => {
+                    targetZone.remove();
+                    meteor.remove();
+                    createHugeExplosion(targetX, targetY);
+                    document.body.classList.add('shake');
+                }, hitTime);
+            }
+        }
+
+        function createHugeExplosion(x, y) {
+            const exp = document.createElement('div');
+            exp.classList.add('explosion');
+            exp.style.left = x + 'px';
+            exp.style.top = y + 'px';
+            document.body.appendChild(exp);
+
+            for (let i = 0; i < 10; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+
+                const angle = (Math.random() * Math.PI) + Math.PI; 
+                const distance = Math.random() * 250 + 80; 
+                const pX = Math.cos(angle) * distance + 'px';
+                const pY = Math.sin(angle) * distance + 'px';
+
+                p.style.setProperty('--tx', pX);
+                p.style.setProperty('--ty', pY);
+
+                const size = Math.random() * 12 + 6;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+
+            setTimeout(() => exp.remove(), 600);
+        }
+    </script>
+</body>
+</html>
