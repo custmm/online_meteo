@@ -264,3 +264,33 @@ body {
         opacity: 0;
     }
 }
+
+/* 배경음악 컨트롤러 줄을 위한 간단한 추가 스타일 */
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            width: 100%;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffaa00;
+            background: rgba(255, 68, 0, 0.1);
+            border: 1px dashed #ff4400;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-label:hover {
+            background: rgba(255, 68, 0, 0.2);
+            box-shadow: 0 0 8px rgba(255, 68, 0, 0.4);
+        }
+        .custom-audio {
+            width: 220px;
+            height: 30px;
+        }
