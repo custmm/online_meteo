@@ -16,6 +16,13 @@
             <div class="control-label">최대 낙하 지연 주기: <span id="intervalDisplay" class="count-value">2.5</span>초</div>
             <input type="range" id="intervalSlider" class="count-slider" min="0.05" max="5" step="0.01" value="2.5" oninput="updateInterval(this.value)">
         </div>
+        <div class="control-row">
+            <div class="audio-wrapper">
+                <label for="bgmInput" class="file-label">🎵 배경음악 파일 선택</label>
+                <input type="file" id="bgmInput" accept="audio/*" style="display: none;" onchange="loadMusic(this)">
+                <audio id="bgmPlayer" class="custom-audio" controls loop></audio>
+            </div>
+        </div>
     </div>
 
     <div class="ground"></div>
@@ -29,6 +36,23 @@
         // 주기 슬라이더 값을 실시간 반영하는 함수
         function updateInterval(val) {
             document.getElementById('intervalDisplay').innerText = val;
+        }
+
+        // 💡 첨부한 음악 파일을 브라우저 임시 URL(Blob)로 변경해 가볍게 재생하는 함수
+        function loadMusic(input) {
+            const file = input.files[0];
+            const player = document.getElementById('bgmPlayer');
+            
+            if (file) {
+                // 기존 재생 중이던 파일 메모리 해제 및 가상 URL 생성
+                if (player.src) {
+                    URL.revokeObjectURL(player.src);
+                }
+                const fileURL = URL.createObjectURL(file);
+                
+                player.src = fileURL;
+                player.play(); // 파일 선택 시 바로 자동 재생 시작
+            }
         }
 
         function dropMeteor() {
